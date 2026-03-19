@@ -418,3 +418,4 @@ C01B0000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_fi
 2026-03-20 03:33:45,978  INFO      ALLOWED | 127.0.0.1:58596 | insert into Students values(5,'shiv',17,'Centum')
 2026-03-20 03:33:52,113  INFO      ALLOWED | 127.0.0.1:58596 | SELECT * FROM Students
 2026-03-20 03:34:08,705  WARNING   BLOCKED | 127.0.0.1:58596 | drop table Students
+2026-03-20 03:38:52,129  INFO      CLOSE    | 127.0.0.1:58596
