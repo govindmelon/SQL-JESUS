@@ -2,7 +2,7 @@
 
 > *"He built, while others erased. A silent guardian. SQL JESUS WILL DIE FOR YOUR SINS."*
 
-A MySQL proxy with a desktop dashboard that sits silently between students and your database, intercepting and blocking destructive SQL queries before they ever reach MySQL. Students connect normally — they never know it's there.
+A MySQL proxy with a desktop dashboard that sits silently between students and your database, intercepting and blocking destructive SQL queries before they ever reach MySQL. Students connect normally, they never know it's there.
 
 ---
 
