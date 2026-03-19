@@ -31,42 +31,27 @@
 # MADE WITH SPITE and RAGE by Govind (mln) Menon
 # ──────────────────────────────────────────────
 
-
 """
-A TCP proxy that sits between students and MySQL, blocking destructive
-SQL statements. Handles SSL termination automatically — generates its
-own cert on first run, no manual openssl commands needed.
+SQL Jesus -- MySQL proxy with dashboard.
+Single file. Run as Administrator.
 
-    Students connect to:  <server-ip>:3306  (proxy, standard port)
-    Real MySQL runs on:   127.0.0.1:3307    (hidden, LAN-unreachable)
-
-Setup (one-time):
-    1. In my.ini under [mysqld]:
-           port         = 3307
-           bind-address = 127.0.0.1
-    2. Restart MySQL:   net stop MySQL80 && net start MySQL80
-    3. Run proxy:       python jesus.py   (as Administrator)
-
-That's it. The proxy generates proxy-cert.pem and proxy-key.pem
-automatically on first run if they don't exist.
-
-To bypass the proxy (run a DROP yourself):
-    mysql -h 127.0.0.1 -P 3307 -u root -p
-
-Log file: proxy.log
+    python jesus.py
 """
 
 import logging
 import os
+import queue
 import re
 import socket
 import ssl
 import subprocess
 import sys
 import threading
-from datetime import (
-    datetime,  # its a fragment, from darker times ignore it and don't ask questions..
-)
+import tkinter as tk
+from collections import defaultdict
+from datetime import datetime, timezone
+from tkinter import font as tkfont
+from tkinter import ttk
 
 # ──────────────────────────────────────────────
 # Configuration
@@ -105,35 +90,63 @@ BLOCKED_PATTERNS = [
 COMPILED_PATTERNS = [re.compile(p, re.IGNORECASE | re.DOTALL) for p in BLOCKED_PATTERNS]
 
 # ──────────────────────────────────────────────
-# Logging
+# Shared state (proxy engine -> dashboard)
 # ──────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-        logging.StreamHandler(),
-    ],
-)
-log = logging.getLogger("mysql_proxy")
+ui_queue = queue.Queue()
+stats_lock = threading.Lock()
+stats = {
+    "total": 0,
+    "blocked": 0,
+    "allowed": 0,
+    "connections": 0,
+    "active": 0,
+}
+blocked_ips = defaultdict(int)
+_server_sock = None
+_proxy_thread = None
+
+
+def push(event: dict):
+    ui_queue.put(event)
+
+
+def inc(key, n=1):
+    with stats_lock:
+        stats[key] += n
 
 
 # ──────────────────────────────────────────────
-# Auto-generate SSL cert if missing
+# Logging -- also feeds the UI queue
+# ──────────────────────────────────────────────
+class UIQueueHandler(logging.Handler):
+    def emit(self, record):
+        push({"type": "log", "level": record.levelname, "msg": self.format(record)})
+
+
+log = logging.getLogger("sql_jesus")
+log.setLevel(logging.DEBUG)
+_fmt = logging.Formatter("%(asctime)s  %(levelname)-8s  %(message)s")
+
+_fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
+_fh.setFormatter(_fmt)
+log.addHandler(_fh)
+
+_sh = logging.StreamHandler()
+_sh.setFormatter(_fmt)
+log.addHandler(_sh)
+
+_uh = UIQueueHandler()
+_uh.setFormatter(_fmt)
+log.addHandler(_uh)
+
+
+# ──────────────────────────────────────────────
+# SSL cert auto-generation
 # ──────────────────────────────────────────────
 def ensure_ssl_cert():
-    """
-    Generate a self-signed cert using Python's cryptography library if available,
-    otherwise fall back to calling openssl on the command line.
-    Either way this is fully automatic — no manual steps needed.
-    """
     if os.path.exists(PROXY_CERT) and os.path.exists(PROXY_KEY):
-        log.debug("SSL cert already exists, skipping generation.")
         return
-
-    log.info("SSL cert not found — generating automatically...")
-
-    # Try pure-Python generation first (cryptography library)
+    log.info("Generating SSL cert...")
     try:
         import datetime as dt
 
@@ -143,16 +156,11 @@ def ensure_ssl_cert():
         from cryptography.x509.oid import NameOID
 
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-
-        subject = issuer = x509.Name(
-            [
-                x509.NameAttribute(NameOID.COMMON_NAME, "mysql-proxy"),
-            ]
-        )
+        name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "mysql-proxy")])
         cert = (
             x509.CertificateBuilder()
-            .subject_name(subject)
-            .issuer_name(issuer)
+            .subject_name(name)
+            .issuer_name(name)
             .public_key(key.public_key())
             .serial_number(x509.random_serial_number())
             .not_valid_before(dt.datetime.now(dt.timezone.utc))
@@ -162,31 +170,20 @@ def ensure_ssl_cert():
             )
             .sign(key, hashes.SHA256())
         )
-
         with open(PROXY_KEY, "wb") as f:
             f.write(
                 key.private_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PrivateFormat.TraditionalOpenSSL,
-                    encryption_algorithm=serialization.NoEncryption(),
+                    serialization.Encoding.PEM,
+                    serialization.PrivateFormat.TraditionalOpenSSL,
+                    serialization.NoEncryption(),
                 )
             )
         with open(PROXY_CERT, "wb") as f:
             f.write(cert.public_bytes(serialization.Encoding.PEM))
-
-        log.info(
-            "SSL cert generated via cryptography library -> %s / %s",
-            PROXY_CERT,
-            PROXY_KEY,
-        )
+        log.info("SSL cert generated.")
         return
-
     except ImportError:
-        log.debug("cryptography library not available, trying openssl CLI...")
-    except Exception as exc:
-        log.warning("cryptography library failed: %s — trying openssl CLI...", exc)
-
-    # Fall back to openssl CLI
+        pass
     cmd = [
         "openssl",
         "req",
@@ -204,25 +201,19 @@ def ensure_ssl_cert():
         "/CN=mysql-proxy",
     ]
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode == 0:
-            log.info(
-                "SSL cert generated via openssl CLI -> %s / %s", PROXY_CERT, PROXY_KEY
-            )
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode == 0:
+            log.info("SSL cert generated via openssl.")
         else:
-            log.error("openssl failed:\n%s", result.stderr)
-            log.error("Install openssl or run: pip install cryptography")
+            log.error("openssl failed: %s", r.stderr)
             sys.exit(1)
     except FileNotFoundError:
-        log.error("openssl not found on PATH and cryptography library not installed.")
-        log.error("Fix with one of:")
-        log.error("  pip install cryptography")
-        log.error("  Install Git for Windows (includes openssl)")
+        log.error("No openssl and no cryptography lib. Run: pip install cryptography")
         sys.exit(1)
 
 
 # ──────────────────────────────────────────────
-# Helpers
+# Proxy helpers
 # ──────────────────────────────────────────────
 def is_blocked(sql: str) -> str | None:
     for pattern, original in zip(COMPILED_PATTERNS, BLOCKED_PATTERNS):
@@ -238,7 +229,6 @@ def make_error_packet(message: str) -> bytes:
 
 
 def recv_all(sock, n: int) -> bytes | None:
-    """Read exactly n bytes. Returns None on disconnect."""
     buf = b""
     while len(buf) < n:
         try:
@@ -252,24 +242,28 @@ def recv_all(sock, n: int) -> bytes | None:
 
 
 def read_packet(sock) -> bytes | None:
-    """Read one complete MySQL wire-protocol packet (raw or SSL socket)."""
     header = recv_all(sock, 4)
     if header is None:
         return None
-    payload_len = int.from_bytes(header[:3], "little")
-    if payload_len == 0:
+    plen = int.from_bytes(header[:3], "little")
+    if plen == 0:
         return header
-    payload = recv_all(sock, payload_len)
+    payload = recv_all(sock, plen)
     if payload is None:
         return None
     return header + payload
 
 
-# ──────────────────────────────────────────────
-# SSL contexts
-# ──────────────────────────────────────────────
+CLIENT_SSL = 0x00000800
+
+
+def client_wants_ssl(pkt: bytes) -> bool:
+    if len(pkt) < 8:
+        return False
+    return bool(int.from_bytes(pkt[4:8], "little") & CLIENT_SSL)
+
+
 def make_server_ssl_ctx() -> ssl.SSLContext:
-    """SSL context the proxy uses when accepting connections from clients."""
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ctx.load_cert_chain(certfile=PROXY_CERT, keyfile=PROXY_KEY)
     ctx.minimum_version = ssl.TLSVersion.TLSv1_2
@@ -277,7 +271,6 @@ def make_server_ssl_ctx() -> ssl.SSLContext:
 
 
 def make_client_ssl_ctx() -> ssl.SSLContext:
-    """SSL context the proxy uses when connecting to MySQL."""
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -285,42 +278,22 @@ def make_client_ssl_ctx() -> ssl.SSLContext:
 
 
 # ──────────────────────────────────────────────
-# MySQL capability flag for SSL
-# ──────────────────────────────────────────────
-CLIENT_SSL = 0x00000800
-
-
-def client_wants_ssl(pkt: bytes) -> bool:
-    """Return True if the client's capability flags have the SSL bit set."""
-    if len(pkt) < 8:
-        return False
-    caps = int.from_bytes(pkt[4:8], "little")
-    return bool(caps & CLIENT_SSL)
-
-
-# ──────────────────────────────────────────────
 # Per-connection handler
-#
-# MySQL SSL handshake:
-#   [plaintext]
-#   S->C  seq=0  Server greeting (0x0a)
-#   C->S  seq=1  SSL Request (32 bytes, capability flags only, SSL bit set)
-#   [both upgrade to SSL]
-#   C->S  seq=2  Full auth packet (user, password hash, db)
-#   S->C  seq=2  OK / ERR / auth-switch
-#   ... possible caching_sha2 extra round trips ...
-#   S->C         Final OK (0x00) — auth complete
-#   [query phase — COM_QUERY seq=0 cmd=0x03]
 # ──────────────────────────────────────────────
 def handle_client(client_sock: socket.socket, client_addr: tuple):
     addr = f"{client_addr[0]}:{client_addr[1]}"
+    ip = client_addr[0]
     log.info("CONNECT  | %s", addr)
+    inc("connections")
+    inc("active")
+    push({"type": "connect", "addr": addr})
 
     try:
         raw_server = socket.create_connection((MYSQL_HOST, MYSQL_PORT), timeout=10)
     except OSError as exc:
-        log.error("Cannot reach MySQL at %s:%d — %s", MYSQL_HOST, MYSQL_PORT, exc)
+        log.error("Cannot reach MySQL: %s", exc)
         client_sock.close()
+        inc("active", -1)
         return
 
     client_sock.settimeout(300)
@@ -336,77 +309,49 @@ def handle_client(client_sock: socket.socket, client_addr: tuple):
         except:
             pass
 
-    # ── Step 1: read server greeting (plaintext) ──
     greeting = read_packet(raw_server)
     if greeting is None:
-        log.error("No greeting from MySQL | %s", addr)
         close_both(client_sock, raw_server)
+        inc("active", -1)
         return
-    log.debug("GREETING | %s | seq=%d len=%d", addr, greeting[3], len(greeting))
 
-    # ── Step 2: forward greeting to client (plaintext) ──
     try:
         client_sock.sendall(greeting)
     except OSError:
         close_both(client_sock, raw_server)
+        inc("active", -1)
         return
 
-    # ── Step 3: read client's first response ──
     client_resp = read_packet(client_sock)
     if client_resp is None:
         close_both(client_sock, raw_server)
+        inc("active", -1)
         return
-    log.debug(
-        "CLIENT RESP | %s | seq=%d len=%d wants_ssl=%s",
-        addr,
-        client_resp[3],
-        len(client_resp),
-        client_wants_ssl(client_resp),
-    )
 
-    # ── Step 4: handle SSL upgrade if client wants it ──
     if client_wants_ssl(client_resp):
-        # Forward the SSL request to MySQL so it also upgrades
         try:
             raw_server.sendall(client_resp)
-        except OSError:
-            close_both(client_sock, raw_server)
-            return
-
-        # Upgrade proxy↔MySQL to SSL
-        try:
-            server_ssl_ctx = make_client_ssl_ctx()
-            server_sock = server_ssl_ctx.wrap_socket(
+            server_sock = make_client_ssl_ctx().wrap_socket(
                 raw_server, server_hostname=MYSQL_HOST
             )
+            client_conn = make_server_ssl_ctx().wrap_socket(
+                client_sock, server_side=True
+            )
         except ssl.SSLError as exc:
-            log.error("SSL upgrade to MySQL failed: %s | %s", exc, addr)
+            log.error("SSL upgrade failed: %s", exc)
             close_both(client_sock, raw_server)
+            inc("active", -1)
             return
-
-        # Upgrade proxy↔client to SSL
-        try:
-            client_ssl_ctx = make_server_ssl_ctx()
-            client_conn = client_ssl_ctx.wrap_socket(client_sock, server_side=True)
-        except ssl.SSLError as exc:
-            log.error("SSL upgrade to client failed: %s | %s", exc, addr)
-            close_both(client_sock, server_sock)
-            return
-
-        log.debug("SSL UPGRADE COMPLETE | %s", addr)
     else:
-        # No SSL — both stay as plain sockets
         server_sock = raw_server
         client_conn = client_sock
-        # Forward the non-SSL client response directly to MySQL
         try:
             server_sock.sendall(client_resp)
         except OSError:
             close_both(client_conn, server_sock)
+            inc("active", -1)
             return
 
-    # ── Step 5: finish auth phase, then enter query phase ──
-    # From here both sides are either plain or SSL — read_packet works either way.
     auth_done = threading.Event()
     client_spoke = threading.Event()
 
@@ -416,30 +361,17 @@ def handle_client(client_sock: socket.socket, client_addr: tuple):
             if pkt is None:
                 break
             first = pkt[4] if len(pkt) > 4 else None
-            log.debug(
-                "S->C | %s | seq=%d first=0x%02x len=%d",
-                addr,
-                pkt[3],
-                first or 0,
-                len(pkt),
-            )
-
-            # Auth OK: server sends 0x00 after client has spoken at least once
             if not auth_done.is_set() and client_spoke.is_set() and first == 0x00:
                 auth_done.set()
-                log.debug("AUTH COMPLETE | %s", addr)
-
             try:
                 client_conn.sendall(pkt)
             except OSError:
                 break
-
         auth_done.set()
         close_both(client_conn, server_sock)
 
     def client_to_server():
-        client_spoke.set()  # client already spoke (sent SSL request / first response)
-
+        client_spoke.set()
         while True:
             pkt = read_packet(client_conn)
             if pkt is None:
@@ -449,47 +381,56 @@ def handle_client(client_sock: socket.socket, client_addr: tuple):
             cmd = pkt[4] if len(pkt) > 4 else 0
 
             if not auth_done.is_set():
-                # Auth phase — forward everything, no inspection
-                log.debug(
-                    "C->S [auth] | %s | seq=%d cmd=0x%02x len=%d",
-                    addr,
-                    seq,
-                    cmd,
-                    len(pkt),
-                )
                 try:
                     server_sock.sendall(pkt)
                 except OSError:
                     break
                 continue
 
-            # Query phase — inspect COM_QUERY packets
-            log.debug(
-                "C->S [query] | %s | seq=%d cmd=0x%02x len=%d", addr, seq, cmd, len(pkt)
-            )
-
             if seq == 0x00 and cmd == 0x03:
                 try:
                     sql = pkt[5:].decode("utf-8", errors="replace")
-                    # Strip any leading non-printable bytes (can appear with some clients)
                     sql = sql.lstrip("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09").strip()
                 except Exception:
                     sql = ""
 
+                inc("total")
                 blocked_by = is_blocked(sql)
                 if blocked_by:
-                    log.warning("BLOCKED | %s | %s | %.120s", addr, blocked_by, sql)
+                    inc("blocked")
+                    with stats_lock:
+                        blocked_ips[ip] += 1
+                    log.warning("BLOCKED | %s | %.120s", addr, sql)
+                    push(
+                        {
+                            "type": "blocked",
+                            "addr": addr,
+                            "ip": ip,
+                            "sql": sql,
+                            "rule": blocked_by,
+                            "time": datetime.now().strftime("%H:%M:%S"),
+                        }
+                    )
                     try:
                         client_conn.sendall(
                             make_error_packet(
-                                f"[SQL JESUS] Thou shalt not. Blocked: {blocked_by}"
+                                "[SQL JESUS] : I shield the innocent from your hands of sin..."
                             )
                         )
                     except OSError:
                         break
                     continue
                 else:
+                    inc("allowed")
                     log.info("ALLOWED | %s | %.120s", addr, sql)
+                    push(
+                        {
+                            "type": "allowed",
+                            "addr": addr,
+                            "sql": sql,
+                            "time": datetime.now().strftime("%H:%M:%S"),
+                        }
+                    )
 
             try:
                 server_sock.sendall(pkt)
@@ -504,50 +445,495 @@ def handle_client(client_sock: socket.socket, client_addr: tuple):
     t_c2s.start()
     t_s2c.join()
     t_c2s.join()
+    inc("active", -1)
+    push({"type": "disconnect", "addr": addr})
     log.info("CLOSE    | %s", addr)
 
 
 # ──────────────────────────────────────────────
-# Main
+# Proxy server loop
 # ──────────────────────────────────────────────
-def main():
+def proxy_loop():
+    global _server_sock
     ensure_ssl_cert()
-
-    log.info("=" * 60)
-    log.info("MySQL Proxy starting (intercept mode + SSL termination)")
-    log.info("  Proxy on  %s:%d  <- students connect here", PROXY_HOST, PROXY_PORT)
-    log.info("  MySQL on  %s:%d  <- hidden, localhost only", MYSQL_HOST, MYSQL_PORT)
-    log.info("  SSL cert: %s", os.path.abspath(PROXY_CERT))
-    log.info("  Log file: %s", os.path.abspath(LOG_FILE))
-    log.info("=" * 60)
-
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((PROXY_HOST, PROXY_PORT))
-    server.listen(MAX_THREADS)
-
-    active = 0
     try:
+        srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        srv.bind((PROXY_HOST, PROXY_PORT))
+        srv.listen(MAX_THREADS)
+        _server_sock = srv
+        log.info("Proxy listening on %s:%d", PROXY_HOST, PROXY_PORT)
+        push({"type": "status", "running": True})
+        active = 0
         while True:
-            client_sock, client_addr = server.accept()
+            try:
+                cs, ca = srv.accept()
+            except OSError:
+                break
             if active >= MAX_THREADS:
-                log.warning("Max connections reached, rejecting %s", client_addr)
-                client_sock.close()
+                cs.close()
                 continue
             active += 1
 
-            def run(cs=client_sock, ca=client_addr):
+            def run(s=cs, a=ca):
                 nonlocal active
-                handle_client(cs, ca)
+                handle_client(s, a)
                 active -= 1
 
             threading.Thread(target=run, daemon=True).start()
-
-    except KeyboardInterrupt:
-        log.info("Proxy stopped by user.")
+    except OSError as exc:
+        log.error("Proxy error: %s", exc)
     finally:
-        server.close()
+        push({"type": "status", "running": False})
+        log.info("Proxy stopped.")
 
 
+def start_proxy():
+    global _proxy_thread
+    _proxy_thread = threading.Thread(target=proxy_loop, daemon=True)
+    _proxy_thread.start()
+
+
+def stop_proxy():
+    global _server_sock
+    if _server_sock:
+        try:
+            _server_sock.close()
+        except OSError:
+            pass
+        _server_sock = None
+
+
+# ──────────────────────────────────────────────
+# Custom slim scrollbar
+# ──────────────────────────────────────────────
+class SlimScrollbar(tk.Canvas):
+    TRACK = "#1a1a1a"
+    THUMB = "#444444"
+    HOVER = "#666666"
+
+    def __init__(self, master, orient="vertical", command=None, **kw):
+        kw.setdefault("bg", self.TRACK)
+        kw.setdefault("highlightthickness", 0)
+        kw.setdefault("bd", 0)
+        kw.setdefault("relief", "flat")
+        if orient == "vertical":
+            kw.setdefault("width", 6)
+        else:
+            kw.setdefault("height", 6)
+        super().__init__(master, **kw)
+        self._orient = orient
+        self._command = command
+        self._thumb = None
+        self._pos = (0.0, 1.0)
+        self._drag_y = None
+        self._drag_x = None
+        self.bind("<Configure>", self._redraw)
+        self.bind("<ButtonPress-1>", self._on_press)
+        self.bind("<B1-Motion>", self._on_drag)
+        self.bind("<ButtonRelease-1>", self._on_release)
+        self.bind("<Enter>", lambda e: self._set_thumb_color(self.HOVER))
+        self.bind("<Leave>", lambda e: self._set_thumb_color(self.THUMB))
+
+    def set(self, first, last):
+        self._pos = (float(first), float(last))
+        self._redraw()
+
+    def _redraw(self, event=None):
+        self.delete("thumb")
+        w = self.winfo_width()
+        h = self.winfo_height()
+        if w < 1 or h < 1:
+            return
+        first, last = self._pos
+        pad = 2
+        if self._orient == "vertical":
+            self._thumb = self.create_rectangle(
+                pad,
+                first * h + pad,
+                w - pad,
+                last * h - pad,
+                fill=self.THUMB,
+                outline="",
+                tags="thumb",
+                width=0,
+            )
+        else:
+            self._thumb = self.create_rectangle(
+                first * w + pad,
+                pad,
+                last * w - pad,
+                h - pad,
+                fill=self.THUMB,
+                outline="",
+                tags="thumb",
+                width=0,
+            )
+
+    def _set_thumb_color(self, color):
+        if self._thumb:
+            self.itemconfig(self._thumb, fill=color)
+
+    def _on_press(self, event):
+        self._drag_y = event.y
+        self._drag_x = event.x
+
+    def _on_drag(self, event):
+        if self._command is None:
+            return
+        first, last = self._pos
+        size = last - first
+        if self._orient == "vertical":
+            delta = (event.y - self._drag_y) / max(self.winfo_height(), 1)
+            self._drag_y = event.y
+        else:
+            delta = (event.x - self._drag_x) / max(self.winfo_width(), 1)
+            self._drag_x = event.x
+        self._command("moveto", max(0.0, min(1.0 - size, first + delta)))
+
+    def _on_release(self, event):
+        self._drag_y = None
+        self._drag_x = None
+
+
+# ──────────────────────────────────────────────
+# Dashboard UI
+# ──────────────────────────────────────────────
+class Dashboard(tk.Tk):
+    BG = "#000000"
+    SURFACE = "#111111"
+    SURFACE2 = "#1a1a1a"
+    ACCENT = "#ffffff"
+    TEXT = "#ededed"
+    MUTED = "#555555"
+    BORDER = "#222222"
+
+    def __init__(self):
+        super().__init__()
+        self.title("SQL Jesus -- Proxy Dashboard")
+        self.configure(bg=self.BG)
+        self.geometry("1100x720")
+        self.minsize(900, 600)
+        self.proxy_running = False
+        self._build_ui()
+        self._poll()
+
+    def _build_ui(self):
+        mono = tkfont.Font(family="Consolas", size=9)
+
+        # top bar
+        topbar = tk.Frame(self, bg=self.SURFACE, height=56)
+        topbar.pack(fill="x", side="top")
+        topbar.pack_propagate(False)
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", side="top")
+
+        title_frame = tk.Frame(topbar, bg=self.SURFACE)
+        title_frame.pack(side="left", padx=20)
+        tk.Label(
+            title_frame,
+            text="\u271d",
+            bg=self.SURFACE,
+            fg=self.ACCENT,
+            font=("Georgia", 22, "italic"),
+        ).pack(side="left", padx=(0, 6))
+        tk.Label(
+            title_frame,
+            text="SQL Jesus",
+            bg=self.SURFACE,
+            fg=self.ACCENT,
+            font=("Georgia", 16, "italic"),
+        ).pack(side="left")
+
+        self.status_dot = tk.Label(
+            topbar, text="\u25cf", bg=self.SURFACE, fg="#333333", font=("Segoe UI", 14)
+        )
+        self.status_dot.pack(side="left")
+        self.status_lbl = tk.Label(
+            topbar,
+            text="Stopped",
+            bg=self.SURFACE,
+            fg=self.MUTED,
+            font=("Segoe UI", 10),
+        )
+        self.status_lbl.pack(side="left", padx=(4, 20))
+
+        self.toggle_btn = tk.Button(
+            topbar,
+            text="\u25b6  Start Proxy",
+            bg="#ffffff",
+            fg="#000000",
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
+            padx=16,
+            pady=6,
+            cursor="hand2",
+            command=self._toggle_proxy,
+        )
+        self.toggle_btn.pack(side="right", padx=20, pady=10)
+
+        # stat cards
+        cards = tk.Frame(self, bg=self.BG)
+        cards.pack(fill="x", padx=16, pady=(12, 0))
+        self.stat_vars = {}
+        defs = [
+            ("total", "Total Queries", self.TEXT),
+            ("allowed", "Allowed", self.TEXT),
+            ("blocked", "Blocked", "#ff4444"),
+            ("connections", "Connections", "#888888"),
+            ("active", "Active Now", self.TEXT),
+        ]
+        for key, label, colour in defs:
+            border = tk.Frame(cards, bg=self.BORDER, padx=1, pady=1)
+            border.pack(side="left", expand=True, fill="both", padx=6)
+            card = tk.Frame(border, bg=self.SURFACE2, padx=18, pady=12)
+            card.pack(fill="both", expand=True)
+            v = tk.StringVar(value="0")
+            self.stat_vars[key] = v
+            tk.Label(
+                card,
+                textvariable=v,
+                bg=self.SURFACE2,
+                fg=colour,
+                font=("Segoe UI", 26, "bold"),
+            ).pack(anchor="w")
+            tk.Label(
+                card, text=label, bg=self.SURFACE2, fg=self.MUTED, font=("Segoe UI", 9)
+            ).pack(anchor="w")
+
+        # main area — vertical split: log on top, blocked table below
+        main = tk.Frame(self, bg=self.BG)
+        main.pack(fill="both", expand=True, padx=16, pady=12)
+
+        # top: live log
+        tk.Label(
+            main,
+            text="Live feed",
+            bg=self.BG,
+            fg=self.MUTED,
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w", pady=(0, 4))
+
+        log_border = tk.Frame(main, bg=self.BORDER, padx=1, pady=1)
+        log_border.pack(fill="both", expand=True)
+        log_frame = tk.Frame(log_border, bg=self.SURFACE)
+        log_frame.pack(fill="both", expand=True)
+
+        self.log_box = tk.Text(
+            log_frame,
+            bg=self.SURFACE,
+            fg=self.TEXT,
+            font=mono,
+            relief="flat",
+            bd=0,
+            state="disabled",
+            wrap="none",
+            insertbackground=self.TEXT,
+        )
+        log_vsb = SlimScrollbar(
+            log_frame, orient="vertical", command=self.log_box.yview
+        )
+        log_hsb = SlimScrollbar(
+            log_frame, orient="horizontal", command=self.log_box.xview
+        )
+        self.log_box.configure(yscrollcommand=log_vsb.set, xscrollcommand=log_hsb.set)
+        log_vsb.pack(side="right", fill="y")
+        log_hsb.pack(side="bottom", fill="x")
+        self.log_box.pack(fill="both", expand=True)
+
+        self.log_box.tag_config("BLOCKED", foreground="#ff4444")
+        self.log_box.tag_config("ALLOWED", foreground="#aaaaaa")
+        self.log_box.tag_config("INFO", foreground=self.TEXT)
+        self.log_box.tag_config("DEBUG", foreground=self.MUTED)
+        self.log_box.tag_config("WARNING", foreground="#cccccc")
+        self.log_box.tag_config("ERROR", foreground="#ffffff")
+
+        # bottom: blocked attempts (full width) + repeat offenders side by side
+        bottom = tk.Frame(main, bg=self.BG)
+        bottom.pack(fill="x", pady=(12, 0))
+
+        style = ttk.Style(self)
+        style.theme_use("clam")
+        style.configure(
+            "Dark.Treeview",
+            background=self.SURFACE,
+            foreground=self.TEXT,
+            fieldbackground=self.SURFACE,
+            rowheight=24,
+            font=("Consolas", 9),
+        )
+        style.configure(
+            "Dark.Treeview.Heading",
+            background=self.SURFACE2,
+            foreground=self.MUTED,
+            font=("Segoe UI", 9, "bold"),
+            relief="flat",
+        )
+        style.map(
+            "Dark.Treeview",
+            background=[("selected", "#333333")],
+            foreground=[("selected", "#ffffff")],
+        )
+
+        # blocked attempts — left side of bottom strip
+        blocked_col = tk.Frame(bottom, bg=self.BG)
+        blocked_col.pack(side="left", fill="both", expand=True)
+        tk.Label(
+            blocked_col,
+            text="Blocked attempts",
+            bg=self.BG,
+            fg=self.MUTED,
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w", pady=(0, 4))
+
+        tree_border = tk.Frame(blocked_col, bg=self.BORDER, padx=1, pady=1)
+        tree_border.pack(fill="both", expand=True)
+        tree_frame = tk.Frame(tree_border, bg=self.SURFACE)
+        tree_frame.pack(fill="both", expand=True)
+
+        cols = ("time", "ip", "sql", "rule")
+        self.tree = ttk.Treeview(
+            tree_frame,
+            columns=cols,
+            show="headings",
+            style="Dark.Treeview",
+            height=7,
+            selectmode="browse",
+        )
+        self.tree.heading("time", text="Time")
+        self.tree.heading("ip", text="IP")
+        self.tree.heading("sql", text="Query")
+        self.tree.heading("rule", text="Rule")
+        self.tree.column("time", width=70, stretch=False)
+        self.tree.column("ip", width=120, stretch=False)
+        self.tree.column("sql", width=400)
+        self.tree.column("rule", width=200, stretch=False)
+
+        tree_vsb = SlimScrollbar(tree_frame, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=tree_vsb.set)
+        tree_vsb.pack(side="right", fill="y")
+        self.tree.pack(fill="both", expand=True)
+
+        # repeat offenders -- right side of bottom strip
+        offenders_col = tk.Frame(bottom, bg=self.BG, width=220)
+        offenders_col.pack(side="right", fill="y", padx=(14, 0))
+        offenders_col.pack_propagate(False)
+        tk.Label(
+            offenders_col,
+            text="Repeat offenders",
+            bg=self.BG,
+            fg=self.MUTED,
+            font=("Segoe UI", 9, "bold"),
+        ).pack(anchor="w", pady=(0, 4))
+
+        ip_border = tk.Frame(offenders_col, bg=self.BORDER, padx=1, pady=1)
+        ip_border.pack(fill="both", expand=True)
+        ip_frame = tk.Frame(ip_border, bg=self.SURFACE)
+        ip_frame.pack(fill="both", expand=True)
+
+        cols2 = ("ip", "count")
+        self.ip_tree = ttk.Treeview(
+            ip_frame,
+            columns=cols2,
+            show="headings",
+            style="Dark.Treeview",
+            height=7,
+            selectmode="none",
+        )
+        self.ip_tree.heading("ip", text="Student IP")
+        self.ip_tree.heading("count", text="Blocks")
+        self.ip_tree.column("ip", width=140)
+        self.ip_tree.column("count", width=50, stretch=False)
+        self.ip_tree.pack(fill="both", expand=True)
+
+    def _toggle_proxy(self):
+        if not self.proxy_running:
+            start_proxy()
+            self.toggle_btn.config(
+                text="\u23f9  Stop Proxy", bg="#333333", fg="#ffffff"
+            )
+        else:
+            stop_proxy()
+            self.toggle_btn.config(
+                text="\u25b6  Start Proxy", bg="#ffffff", fg="#000000"
+            )
+            self._set_status(False)
+
+    def _set_status(self, running: bool):
+        self.proxy_running = running
+        if running:
+            self.status_dot.config(fg="#ffffff")
+            self.status_lbl.config(text="Running  --  listening on :3306", fg="#ededed")
+        else:
+            self.status_dot.config(fg="#333333")
+            self.status_lbl.config(text="Stopped", fg=self.MUTED)
+
+    def _append_log(self, msg: str, tag: str = "INFO"):
+        self.log_box.config(state="normal")
+        self.log_box.insert("end", msg + "\n", tag)
+        self.log_box.see("end")
+        lines = int(self.log_box.index("end-1c").split(".")[0])
+        if lines > 2000:
+            self.log_box.delete("1.0", f"{lines - 2000}.0")
+        self.log_box.config(state="disabled")
+
+    def _add_blocked(self, event: dict):
+        sql_short = event["sql"][:60] + ("\u2026" if len(event["sql"]) > 60 else "")
+        rule_short = event["rule"].replace(r"\b", "").replace(r"\s+", " ")[:30]
+        self.tree.insert(
+            "", 0, values=(event["time"], event["ip"], sql_short, rule_short)
+        )
+        rows = self.tree.get_children()
+        if len(rows) > 200:
+            self.tree.delete(rows[-1])
+
+    def _refresh_ip_table(self):
+        for row in self.ip_tree.get_children():
+            self.ip_tree.delete(row)
+        with stats_lock:
+            sorted_ips = sorted(blocked_ips.items(), key=lambda x: -x[1])
+        for ip, count in sorted_ips[:10]:
+            self.ip_tree.insert("", "end", values=(ip, count))
+
+    def _refresh_stats(self):
+        with stats_lock:
+            snap = dict(stats)
+        for key, var in self.stat_vars.items():
+            var.set(str(snap.get(key, 0)))
+
+    def _poll(self):
+        dirty_ips = False
+        try:
+            while True:
+                event = ui_queue.get_nowait()
+                etype = event.get("type")
+                if etype == "log":
+                    lvl = event.get("level", "INFO")
+                    msg = event.get("msg", "")
+                    tag = (
+                        "BLOCKED"
+                        if "BLOCKED" in msg
+                        else "ALLOWED"
+                        if "ALLOWED" in msg
+                        else lvl
+                    )
+                    self._append_log(msg, tag)
+                elif etype == "blocked":
+                    self._add_blocked(event)
+                    dirty_ips = True
+                elif etype == "status":
+                    self._set_status(event.get("running", False))
+        except queue.Empty:
+            pass
+
+        self._refresh_stats()
+        if dirty_ips:
+            self._refresh_ip_table()
+        self.after(150, self._poll)
+
+
+# ──────────────────────────────────────────────
+# Entry point
+# ──────────────────────────────────────────────
 if __name__ == "__main__":
-    main()
+    app = Dashboard()
+    app.mainloop()

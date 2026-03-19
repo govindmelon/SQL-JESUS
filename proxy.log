@@ -264,3 +264,157 @@ C01B0000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_fi
 2026-03-20 01:50:23,609  DEBUG     S->C | 127.0.0.1:57357 | seq=1 first=0x00 len=11
 2026-03-20 01:50:29,930  DEBUG     C->S [query] | 127.0.0.1:57357 | seq=0 cmd=0x03 len=25
 2026-03-20 01:50:29,931  WARNING   BLOCKED | 127.0.0.1:57357 | \bDROP\s+(DATABASE|SCHEMA|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|EVENT|INDEX)\b | drop database shiv
+2026-03-20 01:56:44,556  DEBUG     SSL cert already exists, skipping generation.
+2026-03-20 01:56:44,556  INFO      ============================================================
+2026-03-20 01:56:44,556  INFO      MySQL Proxy starting (intercept mode + SSL termination)
+2026-03-20 01:56:44,556  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:56:44,557  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:56:44,557  INFO        SSL cert: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy-cert.pem
+2026-03-20 01:56:44,557  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:56:44,557  INFO      ============================================================
+2026-03-20 01:56:56,037  INFO      CONNECT  | 127.0.0.1:57492
+2026-03-20 01:56:56,065  DEBUG     GREETING | 127.0.0.1:57492 | seq=0 len=78
+2026-03-20 01:56:56,065  DEBUG     CLIENT RESP | 127.0.0.1:57492 | seq=1 len=36 wants_ssl=True
+2026-03-20 01:56:56,075  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57492
+2026-03-20 01:56:56,076  DEBUG     C->S [auth] | 127.0.0.1:57492 | seq=2 cmd=0x85 len=226
+2026-03-20 01:56:56,076  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0x01 len=6
+2026-03-20 01:56:56,076  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0x00 len=11
+2026-03-20 01:56:56,076  DEBUG     AUTH COMPLETE | 127.0.0.1:57492
+2026-03-20 01:56:56,077  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=39
+2026-03-20 01:56:56,077  INFO      ALLOWED | 127.0.0.1:57492 | select @@version_comment limit 1
+2026-03-20 01:56:56,077  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:56:56,078  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=43
+2026-03-20 01:56:56,078  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0x1c len=33
+2026-03-20 01:56:56,078  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0xfe len=11
+2026-03-20 01:57:37,546  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=21
+2026-03-20 01:57:47,632  INFO      ALLOWED | 127.0.0.1:57492 | show databases
+2026-03-20 01:57:47,653  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:57:47,657  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=50
+2026-03-20 01:57:47,657  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0x12 len=23
+2026-03-20 01:57:47,658  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0x05 len=10
+2026-03-20 01:57:47,658  DEBUG     S->C | 127.0.0.1:57492 | seq=5 first=0x12 len=23
+2026-03-20 01:57:47,658  DEBUG     S->C | 127.0.0.1:57492 | seq=6 first=0x06 len=11
+2026-03-20 01:57:47,658  DEBUG     S->C | 127.0.0.1:57492 | seq=7 first=0x04 len=9
+2026-03-20 01:57:47,671  DEBUG     S->C | 127.0.0.1:57492 | seq=8 first=0x03 len=8
+2026-03-20 01:57:47,676  DEBUG     S->C | 127.0.0.1:57492 | seq=9 first=0xfe len=11
+2026-03-20 01:58:09,770  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=25
+2026-03-20 01:58:09,770  WARNING   BLOCKED | 127.0.0.1:57492 | \bDROP\s+(DATABASE|SCHEMA|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|EVENT|INDEX)\b | drop database shiv
+2026-03-20 01:58:26,682  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=21
+2026-03-20 01:58:26,682  INFO      ALLOWED | 127.0.0.1:57492 | show databases
+2026-03-20 01:58:26,683  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:58:26,683  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=50
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0x12 len=23
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0x05 len=10
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=5 first=0x12 len=23
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=6 first=0x06 len=11
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=7 first=0x04 len=9
+2026-03-20 01:58:26,684  DEBUG     S->C | 127.0.0.1:57492 | seq=8 first=0x03 len=8
+2026-03-20 01:58:26,685  DEBUG     S->C | 127.0.0.1:57492 | seq=9 first=0xfe len=11
+2026-03-20 01:58:40,627  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=24
+2026-03-20 01:58:40,627  INFO      ALLOWED | 127.0.0.1:57492 | SELECT DATABASE()
+2026-03-20 01:58:40,628  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:58:40,629  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=36
+2026-03-20 01:58:40,630  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0xfb len=5
+2026-03-20 01:58:40,631  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0xfe len=11
+2026-03-20 01:58:40,631  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x02 len=13
+2026-03-20 01:58:40,632  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0xff len=40
+2026-03-20 01:58:46,091  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=24
+2026-03-20 01:58:46,091  INFO      ALLOWED | 127.0.0.1:57492 | SELECT DATABASE()
+2026-03-20 01:58:46,095  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:58:46,095  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=36
+2026-03-20 01:58:46,096  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0xfb len=5
+2026-03-20 01:58:46,096  DEBUG     S->C | 127.0.0.1:57492 | seq=4 first=0xfe len=11
+2026-03-20 01:58:46,097  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x02 len=9
+2026-03-20 01:58:46,097  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x00 len=20
+2026-03-20 01:58:50,315  DEBUG     C->S [query] | 127.0.0.1:57492 | seq=0 cmd=0x03 len=18
+2026-03-20 01:58:50,315  INFO      ALLOWED | 127.0.0.1:57492 | show tables
+2026-03-20 01:58:50,326  DEBUG     S->C | 127.0.0.1:57492 | seq=1 first=0x01 len=5
+2026-03-20 01:58:50,326  DEBUG     S->C | 127.0.0.1:57492 | seq=2 first=0x03 len=60
+2026-03-20 01:58:50,327  DEBUG     S->C | 127.0.0.1:57492 | seq=3 first=0xfe len=11
+2026-03-20 02:03:50,350  INFO      CLOSE    | 127.0.0.1:57492
+2026-03-20 02:09:28,488  INFO      CONNECT  | 127.0.0.1:57607
+2026-03-20 02:09:28,489  DEBUG     GREETING | 127.0.0.1:57607 | seq=0 len=78
+2026-03-20 02:09:28,490  DEBUG     CLIENT RESP | 127.0.0.1:57607 | seq=1 len=36 wants_ssl=True
+2026-03-20 02:09:28,497  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57607
+2026-03-20 02:09:28,497  DEBUG     C->S [auth] | 127.0.0.1:57607 | seq=2 cmd=0x85 len=226
+2026-03-20 02:09:28,498  DEBUG     S->C | 127.0.0.1:57607 | seq=3 first=0x01 len=6
+2026-03-20 02:09:28,498  DEBUG     S->C | 127.0.0.1:57607 | seq=4 first=0x00 len=11
+2026-03-20 02:09:28,498  DEBUG     AUTH COMPLETE | 127.0.0.1:57607
+2026-03-20 02:09:28,498  DEBUG     C->S [query] | 127.0.0.1:57607 | seq=0 cmd=0x03 len=39
+2026-03-20 02:09:28,499  INFO      ALLOWED | 127.0.0.1:57607 | select @@version_comment limit 1
+2026-03-20 02:09:28,499  DEBUG     S->C | 127.0.0.1:57607 | seq=1 first=0x01 len=5
+2026-03-20 02:09:28,499  DEBUG     S->C | 127.0.0.1:57607 | seq=2 first=0x03 len=43
+2026-03-20 02:09:28,499  DEBUG     S->C | 127.0.0.1:57607 | seq=3 first=0x1c len=33
+2026-03-20 02:09:28,499  DEBUG     S->C | 127.0.0.1:57607 | seq=4 first=0xfe len=11
+2026-03-20 02:09:34,893  INFO      CLOSE    | 127.0.0.1:57607
+2026-03-20 02:37:37,746  DEBUG     SSL cert already exists, skipping generation.
+2026-03-20 02:37:37,747  INFO      ============================================================
+2026-03-20 02:37:37,747  INFO      MySQL Proxy starting (intercept mode + SSL termination)
+2026-03-20 02:37:37,747  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 02:37:37,747  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 02:37:37,747  INFO        SSL cert: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy-cert.pem
+2026-03-20 02:37:37,747  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 02:37:37,747  INFO      ============================================================
+2026-03-20 02:38:36,250  INFO      CONNECT  | 127.0.0.1:57963
+2026-03-20 02:38:36,254  DEBUG     GREETING | 127.0.0.1:57963 | seq=0 len=78
+2026-03-20 02:38:36,254  DEBUG     CLIENT RESP | 127.0.0.1:57963 | seq=1 len=36 wants_ssl=True
+2026-03-20 02:38:36,264  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57963
+2026-03-20 02:38:36,264  DEBUG     C->S [auth] | 127.0.0.1:57963 | seq=2 cmd=0x85 len=227
+2026-03-20 02:38:36,265  DEBUG     S->C | 127.0.0.1:57963 | seq=3 first=0x01 len=6
+2026-03-20 02:38:36,265  DEBUG     S->C | 127.0.0.1:57963 | seq=4 first=0x00 len=11
+2026-03-20 02:38:36,265  DEBUG     AUTH COMPLETE | 127.0.0.1:57963
+2026-03-20 02:38:36,266  DEBUG     C->S [query] | 127.0.0.1:57963 | seq=0 cmd=0x03 len=39
+2026-03-20 02:38:36,266  INFO      ALLOWED | 127.0.0.1:57963 |  select @@version_comment limit 1
+2026-03-20 02:38:36,266  DEBUG     S->C | 127.0.0.1:57963 | seq=1 first=0x01 len=5
+2026-03-20 02:38:36,266  DEBUG     S->C | 127.0.0.1:57963 | seq=2 first=0x03 len=43
+2026-03-20 02:38:36,267  DEBUG     S->C | 127.0.0.1:57963 | seq=3 first=0x1c len=33
+2026-03-20 02:38:36,267  DEBUG     S->C | 127.0.0.1:57963 | seq=4 first=0xfe len=11
+2026-03-20 02:38:51,690  DEBUG     C->S [query] | 127.0.0.1:57963 | seq=0 cmd=0x03 len=25
+2026-03-20 02:38:51,690  WARNING   BLOCKED | 127.0.0.1:57963 | \bDROP\s+(DATABASE|SCHEMA|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|EVENT|INDEX)\b |  drop database shiv
+2026-03-20 02:43:36,270  INFO      CLOSE    | 127.0.0.1:57963
+2026-03-20 02:58:55,963  INFO      Proxy listening on 0.0.0.0:3306
+2026-03-20 03:17:28,155  INFO      Proxy listening on 0.0.0.0:3306
+2026-03-20 03:17:36,070  INFO      CONNECT  | 127.0.0.1:58381
+2026-03-20 03:17:36,083  INFO      ALLOWED | 127.0.0.1:58381 | select @@version_comment limit 1
+2026-03-20 03:17:44,033  INFO      ALLOWED | 127.0.0.1:58381 | SELECT DATABASE()
+2026-03-20 03:17:49,929  INFO      ALLOWED | 127.0.0.1:58381 | create databse shiv
+2026-03-20 03:17:53,409  INFO      ALLOWED | 127.0.0.1:58381 | SELECT DATABASE()
+2026-03-20 03:18:00,376  WARNING   BLOCKED | 127.0.0.1:58381 | drop database shiv
+2026-03-20 03:18:30,324  INFO      CLOSE    | 127.0.0.1:58381
+2026-03-20 03:28:32,978  INFO      Proxy listening on 0.0.0.0:3306
+2026-03-20 03:28:44,936  INFO      CONNECT  | 127.0.0.1:58539
+2026-03-20 03:28:44,995  INFO      ALLOWED | 127.0.0.1:58539 | select @@version_comment limit 1
+2026-03-20 03:28:55,568  INFO      ALLOWED | 127.0.0.1:58539 | SELECT DATABASE()
+2026-03-20 03:29:01,585  INFO      ALLOWED | 127.0.0.1:58539 | SELECT DATABASE()
+2026-03-20 03:29:05,633  INFO      ALLOWED | 127.0.0.1:58539 | show tables
+2026-03-20 03:29:14,817  WARNING   BLOCKED | 127.0.0.1:58539 | drop database shiv
+2026-03-20 03:31:55,626  INFO      Proxy listening on 0.0.0.0:3306
+2026-03-20 03:32:18,055  INFO      CONNECT  | 127.0.0.1:58596
+2026-03-20 03:32:18,083  INFO      ALLOWED | 127.0.0.1:58596 | select @@version_comment limit 1
+2026-03-20 03:32:43,269  INFO      ALLOWED | 127.0.0.1:58596 | CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    grade VARCHAR(10)
+)
+2026-03-20 03:32:43,272  INFO      ALLOWED | 127.0.0.1:58596 | INSERT INTO Students (student_id, name, age, grade) VALUES
+(1, 'Arjun', 17, 'A'),
+(2, 'Priya', 18, 'B'),
+(3, 'Rahul', 17
+2026-03-20 03:32:47,418  INFO      ALLOWED | 127.0.0.1:58596 | SELECT * FROM Students
+2026-03-20 03:32:53,146  INFO      ALLOWED | 127.0.0.1:58596 | SELECT DATABASE()
+2026-03-20 03:32:57,193  INFO      ALLOWED | 127.0.0.1:58596 | SELECT DATABASE()
+2026-03-20 03:32:58,256  INFO      ALLOWED | 127.0.0.1:58596 | CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    grade VARCHAR(10)
+)
+2026-03-20 03:32:58,817  INFO      ALLOWED | 127.0.0.1:58596 | INSERT INTO Students (student_id, name, age, grade) VALUES
+(1, 'Arjun', 17, 'A'),
+(2, 'Priya', 18, 'B'),
+(3, 'Rahul', 17
+2026-03-20 03:33:01,409  INFO      ALLOWED | 127.0.0.1:58596 | SELECT * FROM Students
+2026-03-20 03:33:45,978  INFO      ALLOWED | 127.0.0.1:58596 | insert into Students values(5,'shiv',17,'Centum')
+2026-03-20 03:33:52,113  INFO      ALLOWED | 127.0.0.1:58596 | SELECT * FROM Students
+2026-03-20 03:34:08,705  WARNING   BLOCKED | 127.0.0.1:58596 | drop table Students
