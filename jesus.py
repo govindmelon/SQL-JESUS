@@ -610,7 +610,7 @@ class Dashboard(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.title("SQL Jesus -- Proxy Dashboard")
+        self.title("SQL Jesus [4]-- made by govind obviously... ")
         self.configure(bg=self.BG)
         self.geometry("1100x720")
         self.minsize(900, 600)
