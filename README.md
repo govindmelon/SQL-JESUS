@@ -131,4 +131,4 @@ Students have no way to reach port 3307 since it's bound to `127.0.0.1` only.
 
 ---
 
-*Made with spite and rage by Govind (mln) Menon. Time wasted: 9 hours, 32 minutes, 11.768 seconds.*
+*Made with spite and rage by Govind (mln) Menon. Time wasted: 9 hours, 32 minutes, 11.768 seconds. Special thanks ChatGPT & Jishnu*
