@@ -62,7 +62,6 @@ This lets SQL Jesus generate its own SSL cert automatically. No OpenSSL installa
 ### 3. Run as Administrator
 
 ```bash
-conda activate your-env
 python jesus.py
 ```
 
