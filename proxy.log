@@ -1,0 +1,266 @@
+2026-03-20 00:30:56,244  INFO      ============================================================
+2026-03-20 00:30:56,244  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:30:56,244  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:30:56,260  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:30:56,260  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:30:56,260  INFO        Students need zero changes on their end.
+2026-03-20 00:30:56,260  INFO      ============================================================
+2026-03-20 00:39:06,952  INFO      ============================================================
+2026-03-20 00:39:06,952  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:39:06,952  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:39:06,952  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:39:06,952  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:39:06,952  INFO        Students need zero changes on their end.
+2026-03-20 00:39:06,952  INFO      ============================================================
+2026-03-20 00:41:19,611  INFO      ============================================================
+2026-03-20 00:41:19,611  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:41:19,611  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:41:19,611  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:41:19,611  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:41:19,611  INFO        Students need zero changes on their end.
+2026-03-20 00:41:19,611  INFO      ============================================================
+2026-03-20 00:51:19,121  INFO      ============================================================
+2026-03-20 00:51:19,121  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:51:19,131  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:51:19,131  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:51:19,131  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:51:19,131  INFO        Students need zero changes on their end.
+2026-03-20 00:51:19,131  INFO      ============================================================
+2026-03-20 00:51:32,912  INFO      CONNECT  | 127.0.0.1:56587
+2026-03-20 00:53:38,581  INFO      CLOSE    | 127.0.0.1:56587
+2026-03-20 00:53:38,861  INFO      ============================================================
+2026-03-20 00:53:38,861  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:53:38,861  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:53:38,861  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:53:38,861  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:53:38,861  INFO        Students need zero changes on their end.
+2026-03-20 00:53:38,861  INFO      ============================================================
+2026-03-20 00:53:51,042  INFO      CONNECT  | 127.0.0.1:56627
+2026-03-20 00:55:40,691  INFO      CLOSE    | 127.0.0.1:56627
+2026-03-20 00:55:43,062  INFO      ============================================================
+2026-03-20 00:55:43,062  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 00:55:43,062  INFO        Proxy on     0.0.0.0:3306  ← students connect here (standard port)
+2026-03-20 00:55:43,062  INFO        MySQL on     127.0.0.1:3307  ← hidden, localhost only
+2026-03-20 00:55:43,062  INFO        Log file:    C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 00:55:43,062  INFO        Students need zero changes on their end.
+2026-03-20 00:55:43,062  INFO      ============================================================
+2026-03-20 00:55:56,471  INFO      CONNECT  | 127.0.0.1:56662
+2026-03-20 00:57:38,613  INFO      CLOSE    | 127.0.0.1:56662
+2026-03-20 00:58:26,112  INFO      CONNECT  | 127.0.0.1:56684
+2026-03-20 00:59:44,261  INFO      CLOSE    | 127.0.0.1:56684
+2026-03-20 01:00:51,241  INFO      ============================================================
+2026-03-20 01:00:51,241  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:00:51,241  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:00:51,241  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:00:51,241  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:00:51,241  INFO      ============================================================
+2026-03-20 01:01:04,801  INFO      CONNECT  | 127.0.0.1:56715
+2026-03-20 01:01:04,801  DEBUG     PACKET | S->C | client=127.0.0.1:56715      | seq=0 | len=74
+2026-03-20 01:01:04,801  DEBUG     PACKET | C->S | client=127.0.0.1:56715      | seq=1 | len=32
+2026-03-20 01:01:04,801  DEBUG     PACKET | C->S | client=127.0.0.1:56715      | seq=1 | len=66326
+2026-03-20 01:04:18,961  INFO      ============================================================
+2026-03-20 01:04:18,971  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:04:18,971  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:04:18,971  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:04:18,971  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:04:18,971  INFO      ============================================================
+2026-03-20 01:04:30,168  INFO      CONNECT  | 127.0.0.1:56760
+2026-03-20 01:07:34,261  INFO      ============================================================
+2026-03-20 01:07:34,261  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:07:34,261  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:07:34,261  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:07:34,261  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:07:34,261  INFO      ============================================================
+2026-03-20 01:07:58,282  INFO      CONNECT  | 127.0.0.1:56843
+2026-03-20 01:07:58,311  DEBUG     DISCONNECT during handshake | 127.0.0.1:56843
+2026-03-20 01:07:58,311  INFO      CLOSE    | 127.0.0.1:56843
+2026-03-20 01:09:46,156  INFO      ============================================================
+2026-03-20 01:09:46,156  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:09:46,156  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:09:46,156  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:09:46,156  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:09:46,156  INFO      ============================================================
+2026-03-20 01:10:01,885  INFO      CONNECT  | 127.0.0.1:56888
+2026-03-20 01:10:59,677  DEBUG     DISCONNECT during handshake (recv) | 127.0.0.1:56888
+2026-03-20 01:10:59,677  INFO      CLOSE    | 127.0.0.1:56888
+2026-03-20 01:11:27,589  INFO      ============================================================
+2026-03-20 01:11:27,590  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:11:27,590  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:11:27,590  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:11:27,590  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:11:27,590  INFO      ============================================================
+2026-03-20 01:11:47,271  INFO      CONNECT  | 127.0.0.1:56916
+2026-03-20 01:12:57,162  DEBUG     DISCONNECT during handshake (empty) | 127.0.0.1:56916
+2026-03-20 01:12:57,162  INFO      CLOSE    | 127.0.0.1:56916
+2026-03-20 01:13:11,756  INFO      ============================================================
+2026-03-20 01:13:11,757  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:13:11,757  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:13:11,757  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:13:11,757  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:13:11,757  INFO      ============================================================
+2026-03-20 01:13:21,052  INFO      CONNECT  | 127.0.0.1:56954
+2026-03-20 01:14:38,098  DEBUG     DISCONNECT during handshake (empty) | 127.0.0.1:56954
+2026-03-20 01:14:38,099  INFO      CLOSE    | 127.0.0.1:56954
+2026-03-20 01:15:47,242  INFO      ============================================================
+2026-03-20 01:15:47,242  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:15:47,242  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:15:47,242  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:15:47,242  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:15:47,242  INFO      ============================================================
+2026-03-20 01:15:56,481  INFO      CONNECT  | 127.0.0.1:56992
+2026-03-20 01:16:06,482  DEBUG     GREETING | 127.0.0.1:56992 | seq=1 len=54
+2026-03-20 01:16:20,741  INFO      CONNECT  | 127.0.0.1:56997
+2026-03-20 01:18:34,219  INFO      ============================================================
+2026-03-20 01:18:34,219  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:18:34,219  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:18:34,220  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:18:34,220  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:18:34,220  INFO      ============================================================
+2026-03-20 01:18:45,201  INFO      CONNECT  | 127.0.0.1:57031
+2026-03-20 01:18:45,201  DEBUG     S->C | 127.0.0.1:57031 | seq=0 first=0x0a len=78
+2026-03-20 01:18:45,201  DEBUG     C->S [auth] | 127.0.0.1:57031 | seq=1 cmd=0x85 len=36
+2026-03-20 01:18:55,201  DEBUG     S->C | 127.0.0.1:57031 | seq=2 first=0xff len=26
+2026-03-20 01:18:55,201  INFO      CLOSE    | 127.0.0.1:57031
+2026-03-20 01:19:16,722  INFO      ============================================================
+2026-03-20 01:19:16,722  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:19:16,722  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:19:16,722  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:19:16,722  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:19:16,722  INFO      ============================================================
+2026-03-20 01:19:24,025  INFO      ============================================================
+2026-03-20 01:19:24,025  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:19:24,025  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:19:24,026  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:19:24,026  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:19:24,026  INFO      ============================================================
+2026-03-20 01:19:39,191  INFO      ============================================================
+2026-03-20 01:19:39,191  INFO      MySQL Proxy starting (intercept mode)
+2026-03-20 01:19:39,191  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:19:39,191  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:19:39,200  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:19:39,200  INFO      ============================================================
+2026-03-20 01:19:45,892  INFO      CONNECT  | 127.0.0.1:57078
+2026-03-20 01:19:45,892  DEBUG     S->C | 127.0.0.1:57078 | seq=0 first=0x0a len=78
+2026-03-20 01:19:45,892  DEBUG     C->S [auth] | 127.0.0.1:57078 | seq=1 cmd=0x85 len=36
+2026-03-20 01:19:55,901  DEBUG     S->C | 127.0.0.1:57078 | seq=2 first=0xff len=26
+2026-03-20 01:19:55,901  INFO      CLOSE    | 127.0.0.1:57078
+2026-03-20 01:28:11,491  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:28:11,491  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:28:12,032  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+180E0000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+180E0000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:28:12,032  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:30:25,917  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:30:25,917  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:30:25,932  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+94420000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+94420000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:30:25,932  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:31:03,671  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:31:03,672  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:31:03,682  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+44340000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+44340000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:31:03,682  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:34:05,020  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:34:05,020  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:34:05,037  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+6C1F0000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+6C1F0000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:34:05,037  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:35:33,211  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:35:33,211  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:35:33,223  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+B4360000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+B4360000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:35:33,224  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:40:08,041  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:40:08,041  DEBUG     cryptography library not available, trying openssl CLI...
+2026-03-20 01:40:08,057  ERROR     openssl failed:
+Can't open "C:\Program Files\Common Files\ssl\/openssl.cnf" for reading, No such file or directory
+C01B0000:error:80000003:system library:BIO_new_file:No such process:crypto\bio\bss_file.c:67:calling fopen(C:\Program Files\Common Files\ssl\/openssl.cnf, r)
+C01B0000:error:10000080:BIO routines:BIO_new_file:no such file:crypto\bio\bss_file.c:75:
+
+2026-03-20 01:40:08,057  ERROR     Install openssl or run: pip install cryptography
+2026-03-20 01:41:02,417  INFO      SSL cert not found — generating automatically...
+2026-03-20 01:41:02,572  INFO      SSL cert generated via cryptography library -> proxy-cert.pem / proxy-key.pem
+2026-03-20 01:41:02,572  INFO      ============================================================
+2026-03-20 01:41:02,572  INFO      MySQL Proxy starting (intercept mode + SSL termination)
+2026-03-20 01:41:02,572  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:41:02,572  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:41:02,572  INFO        SSL cert: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy-cert.pem
+2026-03-20 01:41:02,572  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:41:02,572  INFO      ============================================================
+2026-03-20 01:41:15,512  INFO      CONNECT  | 127.0.0.1:57312
+2026-03-20 01:41:15,518  DEBUG     GREETING | 127.0.0.1:57312 | seq=0 len=78
+2026-03-20 01:41:15,518  DEBUG     CLIENT RESP | 127.0.0.1:57312 | seq=1 len=36 wants_ssl=True
+2026-03-20 01:41:15,557  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57312
+2026-03-20 01:41:25,556  DEBUG     S->C | 127.0.0.1:57312 | seq=2 first=0xff len=54
+2026-03-20 01:41:25,556  DEBUG     QUERY PHASE | 127.0.0.1:57312
+2026-03-20 01:41:25,557  INFO      CLOSE    | 127.0.0.1:57312
+2026-03-20 01:45:01,721  DEBUG     SSL cert already exists, skipping generation.
+2026-03-20 01:45:01,721  INFO      ============================================================
+2026-03-20 01:45:01,721  INFO      MySQL Proxy starting (intercept mode + SSL termination)
+2026-03-20 01:45:01,721  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:45:01,721  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:45:01,721  INFO        SSL cert: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy-cert.pem
+2026-03-20 01:45:01,721  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:45:01,721  INFO      ============================================================
+2026-03-20 01:45:13,852  INFO      CONNECT  | 127.0.0.1:57335
+2026-03-20 01:45:13,857  DEBUG     GREETING | 127.0.0.1:57335 | seq=0 len=78
+2026-03-20 01:45:13,857  DEBUG     CLIENT RESP | 127.0.0.1:57335 | seq=1 len=36 wants_ssl=True
+2026-03-20 01:45:13,870  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57335
+2026-03-20 01:45:13,891  DEBUG     S->C | 127.0.0.1:57335 | seq=3 first=0x01 len=6
+2026-03-20 01:45:13,891  DEBUG     S->C | 127.0.0.1:57335 | seq=4 first=0x00 len=11
+2026-03-20 01:45:13,893  DEBUG     AUTH COMPLETE | 127.0.0.1:57335
+2026-03-20 01:45:13,961  DEBUG     S->C | 127.0.0.1:57335 | seq=1 first=0x01 len=5
+2026-03-20 01:45:13,961  DEBUG     S->C | 127.0.0.1:57335 | seq=2 first=0x03 len=43
+2026-03-20 01:45:13,961  DEBUG     S->C | 127.0.0.1:57335 | seq=3 first=0x1c len=33
+2026-03-20 01:45:13,961  DEBUG     S->C | 127.0.0.1:57335 | seq=4 first=0xfe len=11
+2026-03-20 01:47:53,229  DEBUG     SSL cert already exists, skipping generation.
+2026-03-20 01:47:53,230  INFO      ============================================================
+2026-03-20 01:47:53,230  INFO      MySQL Proxy starting (intercept mode + SSL termination)
+2026-03-20 01:47:53,230  INFO        Proxy on  0.0.0.0:3306  <- students connect here
+2026-03-20 01:47:53,230  INFO        MySQL on  127.0.0.1:3307  <- hidden, localhost only
+2026-03-20 01:47:53,230  INFO        SSL cert: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy-cert.pem
+2026-03-20 01:47:53,231  INFO        Log file: C:\Users\donke\OneDrive\Documents\GitHub\fuck-sql\proxy.log
+2026-03-20 01:47:53,231  INFO      ============================================================
+2026-03-20 01:48:07,920  INFO      CONNECT  | 127.0.0.1:57357
+2026-03-20 01:48:07,995  DEBUG     GREETING | 127.0.0.1:57357 | seq=0 len=78
+2026-03-20 01:48:07,995  DEBUG     CLIENT RESP | 127.0.0.1:57357 | seq=1 len=36 wants_ssl=True
+2026-03-20 01:48:08,127  DEBUG     SSL UPGRADE COMPLETE | 127.0.0.1:57357
+2026-03-20 01:48:08,128  DEBUG     C->S [auth] | 127.0.0.1:57357 | seq=2 cmd=0x85 len=227
+2026-03-20 01:48:08,128  DEBUG     S->C | 127.0.0.1:57357 | seq=3 first=0x01 len=6
+2026-03-20 01:48:08,128  DEBUG     S->C | 127.0.0.1:57357 | seq=4 first=0x00 len=11
+2026-03-20 01:48:08,129  DEBUG     AUTH COMPLETE | 127.0.0.1:57357
+2026-03-20 01:48:08,129  DEBUG     C->S [query] | 127.0.0.1:57357 | seq=0 cmd=0x03 len=39
+2026-03-20 01:48:08,129  INFO      ALLOWED | 127.0.0.1:57357 | select @@version_comment limit 1
+2026-03-20 01:48:08,130  DEBUG     S->C | 127.0.0.1:57357 | seq=1 first=0x01 len=5
+2026-03-20 01:48:08,130  DEBUG     S->C | 127.0.0.1:57357 | seq=2 first=0x03 len=43
+2026-03-20 01:48:08,130  DEBUG     S->C | 127.0.0.1:57357 | seq=3 first=0x1c len=33
+2026-03-20 01:48:08,130  DEBUG     S->C | 127.0.0.1:57357 | seq=4 first=0xfe len=11
+2026-03-20 01:49:07,450  DEBUG     C->S [query] | 127.0.0.1:57357 | seq=0 cmd=0x03 len=21
+2026-03-20 01:49:07,451  INFO      ALLOWED | 127.0.0.1:57357 | show databases
+2026-03-20 01:49:07,453  DEBUG     S->C | 127.0.0.1:57357 | seq=1 first=0x01 len=5
+2026-03-20 01:49:07,453  DEBUG     S->C | 127.0.0.1:57357 | seq=2 first=0x03 len=50
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=3 first=0x12 len=23
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=4 first=0x05 len=10
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=5 first=0x12 len=23
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=6 first=0x06 len=11
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=7 first=0x03 len=8
+2026-03-20 01:49:07,454  DEBUG     S->C | 127.0.0.1:57357 | seq=8 first=0xfe len=11
+2026-03-20 01:50:23,434  DEBUG     C->S [query] | 127.0.0.1:57357 | seq=0 cmd=0x03 len=27
+2026-03-20 01:50:23,434  INFO      ALLOWED | 127.0.0.1:57357 | create database shiv
+2026-03-20 01:50:23,609  DEBUG     S->C | 127.0.0.1:57357 | seq=1 first=0x00 len=11
+2026-03-20 01:50:29,930  DEBUG     C->S [query] | 127.0.0.1:57357 | seq=0 cmd=0x03 len=25
+2026-03-20 01:50:29,931  WARNING   BLOCKED | 127.0.0.1:57357 | \bDROP\s+(DATABASE|SCHEMA|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|EVENT|INDEX)\b | drop database shiv
