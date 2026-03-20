@@ -61,6 +61,91 @@ try:
 except ImportError:
     HAS_PSUTIL = False
 
+
+# ──────────────────────────────────────────────
+# Auto-updater
+# ──────────────────────────────────────────────
+GITHUB_REPO   = "govindmelon/SQL-Jesus-Releases"
+BRANCH        = "main"
+CURRENT_SHA   = "dev"   # overwritten by build.py when packaged
+
+
+def _load_bundled_sha():
+    """Read version.txt from the PyInstaller bundle or local dir."""
+    global CURRENT_SHA
+    try:
+        # PyInstaller bundles files into sys._MEIPASS
+        base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(base, "version.txt")
+        with open(path) as f:
+            sha = f.read().strip()
+            if sha and sha != "0" * 40:
+                CURRENT_SHA = sha
+    except Exception:
+        pass
+
+
+_load_bundled_sha()
+
+
+def _check_for_updates():
+    """
+    Background thread. Compares current SHA to latest commit on GitHub.
+    Pushes an 'update_available' event to ui_queue if newer.
+    """
+    import urllib.request, json
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/commits/{BRANCH}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "sql-jesus"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data   = json.loads(r.read())
+            latest = data["sha"]
+            msg    = data["commit"]["message"].split("\n")[0][:60]
+            if latest != CURRENT_SHA and CURRENT_SHA != "dev":
+                push({"type": "update_available",
+                      "sha": latest, "msg": msg})
+    except Exception:
+        pass   # silently ignore network errors
+
+
+def _do_update(new_sha):
+    """Download new exe from GitHub releases and swap via updater.py."""
+    import urllib.request, tempfile, subprocess
+    exe_url = (
+        f"https://github.com/{GITHUB_REPO}/raw/{new_sha}/jesus.exe"
+    )
+    push({"type": "update_progress", "msg": "Downloading update..."})
+    try:
+        tmp = tempfile.mktemp(suffix=".exe")
+        urllib.request.urlretrieve(exe_url, tmp)
+
+        current_exe = sys.executable if getattr(sys, "frozen", False) else None
+        if current_exe is None:
+            # Running as .py — just tell user to pull from GitHub
+            push({"type": "update_progress",
+                  "msg": "Pull latest jesus.py from GitHub to update."})
+            return
+
+        # Find or extract updater.py
+        updater_path = os.path.join(os.path.dirname(current_exe), "updater.py")
+        if not os.path.exists(updater_path):
+            base = getattr(sys, "_MEIPASS", "")
+            src  = os.path.join(base, "updater.py")
+            if os.path.exists(src):
+                import shutil
+                shutil.copy(src, updater_path)
+
+        push({"type": "update_progress", "msg": "Restarting to apply update..."})
+        subprocess.Popen(
+            [sys.executable, updater_path, tmp, current_exe],
+            creationflags=0x00000008  # DETACHED_PROCESS on Windows
+        )
+        # Exit so updater can replace the exe
+        os._exit(0)
+
+    except Exception as e:
+        push({"type": "update_progress", "msg": f"Update failed: {e}"})
+
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
@@ -845,6 +930,8 @@ class Dashboard(tk.Tk):
     def _on_splash_done(self):
         self.deiconify()
         self._show_page("dashboard")
+        # Start update check in background
+        threading.Thread(target=_check_for_updates, daemon=True).start()
 
     # ── shell (topbar + page container) ──────────
     def _build_shell(self):
@@ -887,6 +974,28 @@ class Dashboard(tk.Tk):
                                     relief="flat", padx=16, pady=6,
                                     cursor="hand2", command=self._toggle_proxy)
         self.toggle_btn.pack(side="right", padx=20, pady=10)
+
+        # update banner (hidden by default, shown when update available)
+        self._update_bar = tk.Frame(self, bg="#1a1a1a", pady=6)
+        # not packed until update found
+        self._update_bar_packed = False
+
+        update_inner = tk.Frame(self._update_bar, bg="#1a1a1a")
+        update_inner.pack()
+        tk.Label(update_inner, text="Update available", bg="#1a1a1a",
+                 fg="#ededed", font=("Segoe UI", 9, "bold")).pack(side="left", padx=(0,8))
+        self._update_msg_var = tk.StringVar(value="")
+        tk.Label(update_inner, textvariable=self._update_msg_var,
+                 bg="#1a1a1a", fg="#555555",
+                 font=("Segoe UI", 9)).pack(side="left", padx=(0, 16))
+        self._update_btn = tk.Button(update_inner, text="Update & restart",
+                                     bg="#ffffff", fg="#000000",
+                                     font=("Segoe UI", 9, "bold"),
+                                     relief="flat", padx=12, pady=3,
+                                     cursor="hand2",
+                                     command=self._start_update)
+        self._update_btn.pack(side="left")
+        self._pending_sha = None
 
         # page container
         self._container = tk.Frame(self, bg=BG)
@@ -1219,6 +1328,11 @@ class Dashboard(tk.Tk):
 
     # ══════════════════════════════════════════
     # PROXY TOGGLE
+    def _start_update(self):
+        self._update_btn.config(state="disabled", text="Downloading...")
+        threading.Thread(target=_do_update,
+                         args=(self._pending_sha,), daemon=True).start()
+
     # ══════════════════════════════════════════
     def _toggle_proxy(self):
         if not self.proxy_running:
@@ -1394,6 +1508,16 @@ class Dashboard(tk.Tk):
                             fg="#000000", state="normal")
                 elif etype == "progress_msg":
                     self._draw_status_pill(False, event.get("msg", "")[:28])
+                elif etype == "update_available":
+                    self._pending_sha = event.get("sha")
+                    self._update_msg_var.set(event.get("msg", ""))
+                    if not self._update_bar_packed:
+                        tk.Frame(self, bg=BORDER, height=1).pack(
+                            fill="x", before=self._container)
+                        self._update_bar.pack(fill="x", before=self._container)
+                        self._update_bar_packed = True
+                elif etype == "update_progress":
+                    self._update_btn.config(text=event.get("msg", "")[:30])
         except queue.Empty:
             pass
 
