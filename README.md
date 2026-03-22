@@ -125,6 +125,7 @@ Students have no way to reach port 3307 since it's bound to `127.0.0.1` only.
 
 - Python 3.10+
 - `pip install cryptography`
+- `pip install psutil`
 - Windows: run as Administrator
 - MySQL 8.x moved to port 3307 (see setup above)
 
